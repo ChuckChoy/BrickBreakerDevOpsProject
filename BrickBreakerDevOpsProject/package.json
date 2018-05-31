@@ -1,0 +1,9 @@
+{
+  "name": "brick-breaker-dev-ops-project",
+  "version": "0.0.0",
+  "description": "BrickBreakerDevOpsProject",
+  "main": "server.js",
+  "author": {
+    "name": "nikol"
+  }
+}
