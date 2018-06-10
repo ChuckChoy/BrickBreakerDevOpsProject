@@ -24,6 +24,8 @@ server.listen(5000, function () {
 //Create an object to hold our array of player objects & initialize array to hold bricks array & initialize interval/loop variables
 var players = {};
 var bricks = [];
+var brickCount = 0;
+var brickHitCount = 0;
 var physics;
 var update;
 
@@ -90,7 +92,15 @@ function startPhysics() {
                             player.dy = -player.dy;
                             b.status = 0;
                             player.score += 25;
-
+                            //increment the number of bricks "removed"
+                            brickHitCount++;
+                            //if bricks removed equals the brick count
+                            if (brickHitCount === brickCount) {
+                                //send to gameover message to all players
+                                io.sockets.emit('gameOver', "Game complete");
+                                stopPhysics();
+                                stopUpdate();
+                            }
                         }
                     }
                 }
@@ -169,6 +179,8 @@ for (var c = 0; c < brickConfig.brickColumnCount; c++) {
         var brickY = r * (brickConfig.brickHeight + brickConfig.brickPadding) + brickConfig.brickOffsetTop;
         bricks[c][r].x = brickX;
         bricks[c][r].y = brickY;
+        //increment count so it's known when game should end
+        brickCount++;
     }
 }
 
@@ -205,7 +217,7 @@ io.on('connection', function (socket) {
     };
 
     //inform client they are connected
-    socket.emit("connected", "isConnected");
+    socket.emit('playerReady', "isConnected");
 
     //receive update from client and update key position to server.
     socket.on('update', function (data) {

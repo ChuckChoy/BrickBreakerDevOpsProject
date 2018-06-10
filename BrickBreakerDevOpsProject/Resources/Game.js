@@ -11,6 +11,8 @@ var canvas = document.getElementById("myCanvas");
 var ctx = canvas.getContext("2d");
 //get scoreboard span reference
 var scoreboard = document.getElementById("score");
+//variable to set and stop keyboard controls set interval
+var keyboardControls;
 
 //A container to send paddle updates to the server.
 //declaring properties for objects requires colons instead of commas
@@ -42,6 +44,28 @@ window.addEventListener("keyup", function (event) {
 setInterval(function () {
     socket.emit('update', movement);
 }, 1000 / 60);
+
+
+function StartKeyboardControls() {
+    keyboardControls = setInterval(function () {
+        socket.emit('update', movement);
+    }, 1000 / 60);
+}
+
+function StopKeyboardControls() {
+    clearInterval(keyboardControls);
+}
+
+//Sets an interval to check if array of players object is popoulated with atleast 1 player.
+function UpdateCheck() {
+    var check = setInterval(function () {
+        if (Object.keys(arrayOfPlayers).length === 1) {
+            draw(arrayOfPlayers);
+            clearInterval(check);
+        }
+    }, 1000);
+
+}
 
 
 function drawBall(player) {
@@ -89,18 +113,20 @@ function drawBricks(brickSettings) {
     }
 }
 
-function draw(params) {
+function draw() {
     //clear canvas
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     //for each player draw a ball and paddle
-    for (var id in params) {
-        var ActivePlayer = params[id];
+    for (var id in arrayOfPlayers) {
+        var ActivePlayer = arrayOfPlayers[id];
         drawBall(ActivePlayer);
         drawPaddle(ActivePlayer);
         //update score
         scoreboard.innerHTML = ActivePlayer.score;
     }
     drawBricks(brickSettings);
+    //this is a recursive method for better animations.
+    requestAnimationFrame(draw);
 }
 
 //Received updated players object locations and store them in the players array
@@ -117,17 +143,27 @@ socket.on('objectUpdates', function (data) {
 
 
 //once player is connected then start drawing
-socket.on("connected", function () {
-    setInterval(function () {
-        //call the draw function while passing in the players array if array isn't empty
-        if (arrayOfPlayers.length < 1) {
-            console.log("Empty frame");
-        }
-        else {
-            draw(arrayOfPlayers);
-            //console.log("players drawn");
-        }
-    }, 1000 / 60);
+socket.on('playerReady', function () {
+    //start sending keyboard inputs
+    StartKeyboardControls();
+    //Start checking for array of players object to have a player object.
+    UpdateCheck();
+});
+
+//on receiving the "gameover" message stop the game, draw the "game over" on canvas & show scoreboard. Then activate/show start game button.
+socket.on('gameOver', function () {
+    //stop drawing
+    cancelAnimationFrame(draw);
+    //stop sending keyboard inputs
+    StopKeyboardControls();
+    //clear canvas
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    //display "gameover" image in canvas
+    var img = new Image();
+    img.onload = function () {
+        ctx.drawImage(img, 0, 0);
+    };
+    img.src = "/GameOver.png";
 });
 
 
