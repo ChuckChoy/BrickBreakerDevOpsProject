@@ -13,6 +13,8 @@ var ctx = canvas.getContext("2d");
 var scoreboard = document.getElementById("score");
 //variable to set and stop keyboard controls set interval
 var keyboardControls;
+//get 'join game' button
+var btnJoinGame = document.getElementById("join");
 
 //A container to send paddle updates to the server.
 //declaring properties for objects requires colons instead of commas
@@ -40,6 +42,11 @@ window.addEventListener("keyup", function (event) {
     }
 });
 
+//join game
+btnJoinGame.addEventListener("click", function (event) {
+    socket.emit('joinedGame', 'Go');
+}, false);
+
 //send paddle movments to server 60 times a second.
 setInterval(function () {
     socket.emit('update', movement);
@@ -59,7 +66,7 @@ function StopKeyboardControls() {
 //Sets an interval to check if array of players object is popoulated with atleast 1 player.
 function UpdateCheck() {
     var check = setInterval(function () {
-        if (Object.keys(arrayOfPlayers).length === 1) {
+        if (Object.keys(arrayOfPlayers).length === 2) {
             draw(arrayOfPlayers);
             clearInterval(check);
         }
@@ -143,7 +150,7 @@ socket.on('objectUpdates', function (data) {
 
 
 //once player is connected then start drawing
-socket.on('playerReady', function () {
+socket.on('playersReady', function () {
     //start sending keyboard inputs
     StartKeyboardControls();
     //Start checking for array of players object to have a player object.
@@ -164,6 +171,15 @@ socket.on('gameOver', function () {
         ctx.drawImage(img, 0, 0);
     };
     img.src = "/GameOver.png";
+});
+
+socket.on('playerWaiting', function () {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    var img = new Image(600, 400);
+    img.onload = function () {
+        ctx.drawImage(img, 0, 0);
+    };
+    img.src = 'http://www.way2automation.com/download/1419843831wait.jpg';
 });
 
 

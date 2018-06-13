@@ -100,6 +100,8 @@ function startPhysics() {
                                 io.sockets.emit('gameOver', "Game complete");
                                 stopPhysics();
                                 stopUpdate();
+                                //reset game
+                                GameReset();
                             }
                         }
                     }
@@ -123,13 +125,30 @@ function respawn(player) {
     player.dx = 0;
     player.dy = 0;
     //4 second timer before ball reset
-    setTimeout(function () {
-        //reset ball to middle of paddle and speed to original speed.
-        player.dx = 2;
-        player.dy = -2;
+    setTimeout(() => { spawn(player); }, 4000);
+}
+
+//reset game after game over messages is emmitted
+function GameReset() {
+    //loop through all bricks and set status back to 0 (not hit);
+    for (var c = 0; c < brickConfig.brickColumnCount; c++) {
+        for (var r = 0; r < brickConfig.brickRowCount; r++) {
+            var b = bricks[c][r];
+            b.status = 1;
+        }
+    }
+    //change each players score,ball speed,ball location to original
+    for (var id in players) {
+        var player = players[id];
+        player.score = 0;
+        player.dx = 0;
+        player.dy = 2;
+        player.paddleX = paddleX;
         player.x = player.paddleX + player.paddleWidth / 2;
         player.y = canvasHeight - 30;
-    }, 4000);
+    }
+    //change the count of bricks hit back to 0;
+    brickHitCount = 0;
 }
 
 function startUpdate() {
@@ -191,33 +210,48 @@ var brickSettings = { bricks, brickConfig };
 io.on('connection', function (socket) {
     console.log('Connection made');
 
-    //socket.emit("connected", "isConnected");
-    //socket.on('message', console.log);
+    //create player when player presses 'join game' button
+    socket.on("joinedGame", function () {
+        //Add players to an array and intiate starting location of ball and paddle
+        players[socket.id] = {
+            //hard coding canvas height and width for speed sake
+            canvas: {
+                height: canvasHeight,
+                width: canvasWidth
+            },
+            //ball starting position
+            x: x,
+            y: y,
+            //ball position rate of change
+            dx: 0,
+            dy: -2,
+            ballRadius: 10,
+            //paddle
+            paddleHeight: 20,
+            paddleWidth: paddleWidth,
+            paddleThickness: 10,
+            paddleX: paddleX,
+            score: 0
+        };
 
-    //Add players to an array and intiate starting location of ball and paddle
-    players[socket.id] = {
-        //hard coding canvas height and width for speed sake
-        canvas: {
-            height: canvasHeight,
-            width: canvasWidth
-        },
-        //ball starting position
-        x: x,
-        y: y,
-        //ball position rate of change
-        dx: 0,
-        dy: -2,
-        ballRadius: 10,
-        //paddle
-        paddleHeight: 20,
-        paddleWidth: paddleWidth,
-        paddleThickness: 10,
-        paddleX: paddleX,
-        score: 0
-    };
-
-    //inform client they are connected
-    socket.emit('playerReady', "isConnected");
+        //counts nested objects in players object.
+        //wait for 2 players
+        if (Object.keys(players).length === 2) {
+            //inform clients they are connected
+            io.sockets.emit('playersReady', "isConnected");
+            //start physics and emitting physics to clients as updates
+            startPhysics();
+            startUpdate();
+        }
+        //if there are more than 2 players then join game immediately
+        else if (Object.keys(players).length > 2) {
+            socket.emit('playersReady', "isConnected");
+        }
+        //if only one player have them wait for second player.  
+        else {
+            socket.emit('playerWaiting', { players, brickSettings });
+        }
+    });
 
     //receive update from client and update key position to server.
     socket.on('update', function (data) {
@@ -230,15 +264,8 @@ io.on('connection', function (socket) {
         else if (data.leftPressed === true && player.paddleX > 0) {
             player.paddleX -= 7;
         }
-
     });
-
-    //start physics if there is one person connected, by counting nested player objects in the players object.
-    if (Object.keys(players).length === 1) {
-        startPhysics();
-        startUpdate();
-    }
-
+    
     //Disconnect Event
     socket.on("disconnect", function () {
         //console.log(socket.id);
