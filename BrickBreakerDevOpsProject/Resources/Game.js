@@ -170,17 +170,84 @@ socket.on('gameOver', function () {
     img.onload = function () {
         ctx.drawImage(img, 0, 0);
     };
-    img.src = "/GameOver.png";
+    img.src = '/GameOver.png';
 });
 
+//when there is only one player the client receives this messages and draws a player waiting image.
 socket.on('playerWaiting', function () {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     var img = new Image(600, 400);
     img.onload = function () {
         ctx.drawImage(img, 0, 0);
     };
-    img.src = 'http://www.way2automation.com/download/1419843831wait.jpg';
+    img.src = '/Waiting.jpg';
 });
+
+//open reg div for reg fields
+function OpenReg() {
+    var RegDiv = document.getElementById('RegDiv');
+    RegDiv.style.display = 'block';
+}
+//close red div
+function CloseReg() {
+    var RegDiv = document.getElementById('RegDiv');
+    RegDiv.style.display = 'none';
+}
+
+//registration
+function RegSubmit() {
+    // creat a new reqeust
+    var http = new XMLHttpRequest();
+    //get host name
+    var host = window.location.origin;
+     // concat host with route to get url
+    var url = host + '/register';
+    //get values to post to database via server.
+    var UserName = document.getElementById('regUName').value;
+    var Email = document.getElementById('regEmail').value;
+    var Password = document.getElementById('regPass').value;
+    //send http post with values
+    http.open('POST', url, true);
+    //Set the proper header information along with the request
+    http.setRequestHeader('Content-type', 'application/json');
+
+    http.onreadystatechange = function () {//Call a function when the state changes.
+        if (http.readyState === 4 && http.status === 200) {
+            //alert(http.responseText);
+        }
+    };
+    //send the variables as key pair values that have been turned into a string. These are sent in the request body
+    http.send(JSON.stringify({ username: UserName, email: Email, password: Password }));
+    //hide registration
+    CloseReg();
+}
+
+//login
+function Login() {
+    // creat a new reqeust
+    var http = new XMLHttpRequest();
+    //get host name
+    var host = window.location.origin;
+    // concat host with route to get url
+    var url = host + '/login';
+    //get values to post to database via server.
+    var UserName = document.getElementById('userName').value;
+    var Password = document.getElementById('userPass').value;
+    //send http post with values
+    http.open('POST', url, true);
+    //Set the proper header information along with the request
+    http.setRequestHeader('Content-type', 'application/json');
+
+    http.onreadystatechange = function () {//Call a function when the state changes.
+        if (http.readyState === 4 && http.status === 200) {
+            //alert(http.responseText);
+        }
+    };
+    //send the variables as key pair values that have been turned into a string. These are sent in the request body
+    http.send(JSON.stringify({ username: UserName, password: Password }));
+    //hide registration
+    CloseReg();
+}
 
 
 
