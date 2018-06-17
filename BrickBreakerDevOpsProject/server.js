@@ -4,6 +4,7 @@ var http = require('http');
 var path = require('path');
 var socketIO = require('socket.io');
 var routing = require('./Resources/Routing');
+var bodyParser = require('body-parser');
 
 var app = express();
 var server = http.Server(app);
@@ -12,12 +13,15 @@ var io = socketIO(server); // the io assigns a variable to each connection. It a
 //set listening port to 5000
 app.set('port', 5000);
 
+//parses JSON in the HTTP POST request body
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json('application/json'));
 // use the routing in Routing.js
 app.use('/', routing); //moved routing to a differnt file for clarity purposes.
 
 
-//Starts the server
-server.listen(5000, function () {
+//Starts the server. changed port to 80 because azure only has 80 and 443 open
+server.listen(80, function () {
     console.log('Starting server on port 5000');
 });
 

@@ -37,9 +37,12 @@
     <Compile Include="server.js" />
     <Content Include="package.json" />
     <Content Include="README.md" />
+    <Content Include="Resources\GameOver.png" />
     <Content Include="Resources\Index.html">
       <SubType>Code</SubType>
     </Content>
+    <Content Include="Resources\Waiting.jpg" />
+    <Content Include="Web.config" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\" />
