@@ -213,13 +213,11 @@ function RegSubmit() {
 
     http.onreadystatechange = function () {//Call a function when the state changes.
         if (http.readyState === 4 && http.status === 200) {
-            //alert(http.responseText);
+            alert(http.responseText);
         }
     };
     //send the variables as key pair values that have been turned into a string. These are sent in the request body
     http.send(JSON.stringify({ username: UserName, email: Email, password: Password }));
-    //hide registration
-    CloseReg();
 }
 
 //login
@@ -245,8 +243,6 @@ function Login() {
     };
     //send the variables as key pair values that have been turned into a string. These are sent in the request body
     http.send(JSON.stringify({ username: UserName, password: Password }));
-    //hide registration
-    CloseReg();
 }
 
 

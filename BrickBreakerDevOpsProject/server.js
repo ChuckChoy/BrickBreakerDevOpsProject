@@ -11,7 +11,7 @@ var server = http.Server(app);
 var io = socketIO(server); // the io assigns a variable to each connection. It allows us to talk to each conneciton separately.
 
 //set listening port to 5000
-app.set('port', 5000);
+app.set('port', 80);
 
 //parses JSON in the HTTP POST request body
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -22,7 +22,7 @@ app.use('/', routing); //moved routing to a differnt file for clarity purposes.
 
 //Starts the server. changed port to 80 because azure only has 80 and 443 open
 server.listen(80, function () {
-    console.log('Starting server on port 5000');
+    console.log('Starting server on port 80');
 });
 
 //Create an object to hold our array of player objects & initialize array to hold bricks array & initialize interval/loop variables
