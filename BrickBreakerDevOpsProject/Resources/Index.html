@@ -10,6 +10,13 @@
             display: none;
             margin: 0 auto;
         }
+        #centerpiece{
+          text-align:center;
+          position:absolute;
+          background-color: white;
+          top:0; right:0; bottom:0; left:0;
+          height:25em; width:35em; margin:auto;
+        }
         canvas {
             border: 2px solid black;
         }
@@ -24,7 +31,7 @@
         };
     </script>
 </head>
-<body>
+<body style="background-image: url('brick_texture3417.jpg')">
     <div>
         <div style="float:right;">
             <button onclick="Login()">Login</button>
@@ -42,19 +49,19 @@
         </div>
 
     </div>
-    <div style="  text-align:center; position:absolute; top:0; right:0; bottom:0; left:0; height:25em; width:35em; margin:auto;">
-        <div id="veil" style="height:25em; width:40em; background-color:black; opacity:0.5; display:block; margin: 0 auto;">
+    <div style="" id="centerpiece">
+        <div id="veil" style="height:25em; width:35em; background-color:black; opacity:0.5; display:block; margin: 0 auto;">
             <div style="position:relative; top:40%;">
                 <button id="join" style="height:5em; width:35em; margin-bottom:3em" onclick="JoinGame()">Join Game</button><br />
                 <span style="color:red;">Enter Name: </span><input type="text" id="uName" name="GameName" />
             </div>
         </div>
         <div id="canvasContainer">
-            <canvas id="myCanvas" width="600" height="400"></canvas>
+            <canvas id="myCanvas" width="557" height="398"></canvas>
             <span id="score"></span>
         </div>
     </div>
-    
+
     <script src="/game.js"></script>
 </body>
 </html>
