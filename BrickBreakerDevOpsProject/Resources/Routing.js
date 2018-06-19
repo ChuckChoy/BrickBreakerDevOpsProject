@@ -47,20 +47,38 @@ router.get('/GameOver.png', function (request, response) {
 });
 //Login routing
 router.post('/login', function (request, response) {
-    sql.connect(config, function (err) {
-        if (err)
-            console.log(err);
-        new sql.Request()
-            .input('username',sql.VarChar, request.body.username) // inputs needed for stored procedure
-            .input('password', sql.VarChar, request.body.password)
-            .output('Result', sql.Bit)
-            .execute('checkLogin2', function (err, recordset, returnValue) { //name for stored procedure
-                if (err)
-                    console.log(err);
-                console.log(returnValue); //should be 1 on success
+    //get values from POST body
+    var username = request.body.username;
+    var password = request.body.password;
+    //create a return variable
+    var Result = 0;
+    var checkLogin = function () {
+        //prepare a connection with the 'config' values
+        var conn = new sql.ConnectionPool(config);
+        //create the connection to the database then..
+        conn.connect().then(function (conn) {
+            //create a request variable for the connection
+            var request = new sql.Request(conn);
+            //create parameters
+            request.input('username', sql.VarChar(20), username);
+            request.input('password', sql.VarChar(10), password);
+            request.output('Result', sql.Int);
+            //execute the request
+            request.execute('checkLogin4').then(function (err, recordsets, returnValue, affected) {
+                //still doesn't work right
+                console.log("Player ID : " + err.output.Result);
+                Result = err.output.Result;
+            }).catch(function (err) {
+                console.log(err);
             });
-    });
-    //console.log(request.body.username);
+        });
+    };
+    checkLogin();
+    if (Result >= 1)
+        response.send("Success");
+    else
+        response.send("Fail");
+
 });
 ////registration routing
 router.post('/register', function (request, response) {

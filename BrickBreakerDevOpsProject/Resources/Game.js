@@ -238,7 +238,11 @@ function Login() {
 
     http.onreadystatechange = function () {//Call a function when the state changes.
         if (http.readyState === 4 && http.status === 200) {
-            //alert(http.responseText);
+            if (http.responseText === "Success") {
+                var gameName = document.getElementById('uName');
+                gameName.value = UserName;
+            }
+
         }
     };
     //send the variables as key pair values that have been turned into a string. These are sent in the request body
