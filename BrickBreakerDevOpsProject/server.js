@@ -106,6 +106,7 @@ function startPhysics() {
                                 stopUpdate();
                                 //reset game
                                 GameReset();
+                                //record game function.
                             }
                         }
                     }

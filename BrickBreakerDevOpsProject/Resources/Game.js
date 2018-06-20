@@ -52,7 +52,7 @@ setInterval(function () {
     socket.emit('update', movement);
 }, 1000 / 60);
 
-
+//Start and stop client to server keyboard updates
 function StartKeyboardControls() {
     keyboardControls = setInterval(function () {
         socket.emit('update', movement);
@@ -186,6 +186,7 @@ socket.on('playerWaiting', function () {
 //open reg div for reg fields
 function OpenReg() {
     var RegDiv = document.getElementById('RegDiv');
+    RegDiv.focus();
     RegDiv.style.display = 'block';
 }
 //close red div

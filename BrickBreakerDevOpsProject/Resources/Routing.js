@@ -50,34 +50,32 @@ router.post('/login', function (request, response) {
     //get values from POST body
     var username = request.body.username;
     var password = request.body.password;
-    //create a return variable
-    var Result = 0;
-    var checkLogin = function () {
-        //prepare a connection with the 'config' values
-        var conn = new sql.ConnectionPool(config);
-        //create the connection to the database then..
-        conn.connect().then(function (conn) {
-            //create a request variable for the connection
-            var request = new sql.Request(conn);
-            //create parameters
-            request.input('username', sql.VarChar(20), username);
-            request.input('password', sql.VarChar(10), password);
-            request.output('Result', sql.Int);
-            //execute the request
-            request.execute('checkLogin4').then(function (err, recordsets, returnValue, affected) {
-                //still doesn't work right
-                console.log("Player ID : " + err.output.Result);
-                Result = err.output.Result;
-            }).catch(function (err) {
-                console.log(err);
-            });
-        });
-    };
+
+    // create an async fuction
+    async function checkLogin() {
+        try {
+            let pool = await sql.connect(config);
+            // Stored procedure
+            let result = await pool.request()
+                //apparently doing a double input this way works
+                .input('username', sql.VarChar(20), username)
+                .input('password', sql.VarChar(10), password)
+                .output('Result', sql.Int)
+                .execute('checkLogin4');
+
+            //console.dir(result); for testing purposes
+            //if an output value is returned from the record send a success. Else send failure.
+            if (result.output !== "undefined")
+                response.send("Success");
+            else
+                response.send("Fail");
+        } catch (err) {
+            // ... error checks
+            console.log(err);
+        }
+    }
+   //call funciton
     checkLogin();
-    if (Result >= 1)
-        response.send("Success");
-    else
-        response.send("Fail");
 
 });
 ////registration routing
