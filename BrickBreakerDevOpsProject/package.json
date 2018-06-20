@@ -1,6 +1,9 @@
 {
   "name": "brick-breaker-dev-ops-project",
   "version": "0.0.0",
+  "scripts": {
+    "start": "node server"
+  },
   "description": "BrickBreakerDevOpsProject",
   "main": "server.js",
   "author": {

@@ -186,7 +186,6 @@ socket.on('playerWaiting', function () {
 //open reg div for reg fields
 function OpenReg() {
     var RegDiv = document.getElementById('RegDiv');
-    RegDiv.focus();
     RegDiv.style.display = 'block';
 }
 //close red div
